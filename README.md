@@ -37,7 +37,7 @@ You can choose your own categories as you see fit and add new categories at any 
     - *Only New Transactions Since Last Download* if you've already exported data previously.
 3. Click *Continue* to get your csv file.
 
-## How to Use App
+## How to Use the App
 1. Once all the prereqs are met, clone the repository to a local directory and run `streamlit run Data.py` to start the webapp.
 2. Upload the csv you downloaded from your bank using the file uploader.
 3. Edit any transactions and add categories, then click the *Update* button.
