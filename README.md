@@ -1,10 +1,12 @@
 # Personal Finance Tracker
 This is a tool built to help track, categorize, and visualize your income/expenses to help you gain a better understanding of your spending habits and help with budgeting.
 
+![Demo](https://user-images.githubusercontent.com/74384606/227801538-2a2e67a9-21b3-41e2-8add-48ed79a287f1.gif)
+
 **Main Features**
-- Import transactions from your bank to view and edit in an Excel-like table
-- Uses ML to autocategorize transactions
-- Automatically creates a Sankey chart to visualize the flow of money from any time period
+- Import transactions from your bank to view and edit in an Excel-like table.
+- Uses ML to auto-categorize transactions.
+- Automatically creates a Sankey chart to visualize the flow of money from any time period.
 
 ## Prerequisites
 1. Requires Python and pip to be installed. Install requirements with `pip install -r requirements.txt`
@@ -37,6 +39,6 @@ You can choose your own categories as you see fit and add new categories at any 
 
 ## How to Use App
 1. Once all the prereqs are met, clone the repository to a local directory and run `streamlit run Data.py` to start the webapp.
-2. Upload the csv you downloaded from you bank using the file uploader.
+2. Upload the csv you downloaded from your bank using the file uploader.
 3. Edit any transactions and add categories, then click the *Update* button.
 4. Click on the *Visualize* tab to view your transactions in a Sankey chart. Use the slider to select a date range.
