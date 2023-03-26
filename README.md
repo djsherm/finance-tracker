@@ -1,7 +1,7 @@
 # Personal Finance Tracker
 This is a tool built to help track, categorize, and visualize your income/expenses to help you gain a better understanding of your spending habits and help with budgeting.
 
-![Demo](https://user-images.githubusercontent.com/74384606/227801538-2a2e67a9-21b3-41e2-8add-48ed79a287f1.gif)
+![Demo](https://user-images.githubusercontent.com/74384606/227802391-95b3ff2c-463b-4816-a607-cea2fdc0ed76.gif)
 
 **Main Features**
 - Import transactions from your bank to view and edit in an Excel-like table.
