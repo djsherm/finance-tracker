@@ -1,0 +1,11 @@
+[theme]
+primaryColor="#8abeb7"
+backgroundColor="#1d1f21"
+secondaryBackgroundColor="#282a2e"
+textColor="#c5c8c6"
+
+[ui]
+hideTopBar = true
+
+[browser]
+gatherUsageStats = false
