@@ -1,3 +1,4 @@
+import sqlite3
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -6,7 +7,7 @@ from datetime import datetime
 import plotly.graph_objects as go
 import plotly.express as px
 
-from Data import init_connection
+from Data import init_connection, init_db
 
 hide_streamlit_style = """
             <style>
@@ -19,50 +20,56 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 st.title('Visualize')
 
-client = init_connection()
-db = client['mydb']
-tranx = db['tranx']
+conn = init_connection()
+init_db(conn)
 
-# Get first and last date in db
-first_last_date = list(tranx.aggregate([
-        {'$sort': {'Transaction_Date': 1}},
-        {'$group': {'_id': None, 'first': {'$first': '$Transaction_Date'}, 'last': {'$last': '$Transaction_Date'}}}
-    ]))
+# Get date range from db
+first_last_date = conn.execute('SELECT min(transaction_date), max(transaction_date) FROM tranx').fetchall()[0]
 
 try:
-    first_date = first_last_date[0]['first']
-    last_date = first_last_date[0]['last']
-except IndexError:
+    first_date = first_last_date[0]
+    last_date = first_last_date[1]
+except IndexError as e:
+    print(e)
     st.warning('Please load data first.')
     st.stop()
 
 date_range = st.slider(
     "Select Date Range",
-    value=(first_date, last_date),
-    #value=(datetime.strptime(first_date, '%m/%d/%Y'), datetime.strptime(last_date, '%m/%d/%Y')),
+    #value=(first_date, last_date),
+    value=(datetime.strptime(first_date, '%m/%d/%Y').date(), datetime.strptime(last_date, '%m/%d/%Y').date()),
     format="MM/DD/YY")
 
-# Query collection and get an aggregate of the data grouped by category for both income and expenses
-agg = pd.DataFrame(list(tranx.aggregate(
-    [{
-        '$match': {'$and': [{'Transaction_Date': {'$gte': date_range[0]}}, {'Transaction_Date': {'$lte': date_range[1]}}]}
-    },
-    {
-        '$group':
-            {'_id': '$Category',
-            'Total': {'$sum': '$CAD$'}
-            }
-    }]
-)))
+# Get all positive valued transactions
+incomes = conn.execute(
+    """SELECT category,
+                sum(case when cad$ >=0 then cad$ else 0 end) as income
+        FROM tranx
+        WHERE transaction_date >= ? and transaction_date <= ?
+        GROUP BY category
+        HAVING sum(case when cad$ >=0 then cad$ else 0 end) != 0
+    """
+, (date_range[0].strftime('%m/%d/%Y'), date_range[1].strftime('%m/%d/%Y'))).fetchall()
 
-incomes = agg[agg['Total'] > 0].to_dict('records')
-expenses = agg[agg['Total'] < 0].to_dict('records')
+# Get all negative valued transactions
+expenses = conn.execute(
+    """SELECT category,
+                sum(case when cad$ <0 then cad$ else 0 end) as expenses
+        FROM tranx
+        WHERE transaction_date >= ? and transaction_date <= ?
+        GROUP BY category
+        HAVING sum(case when cad$ <0 then cad$ else 0 end) != 0
+    """
+, (date_range[0].strftime('%m/%d/%Y'), date_range[1].strftime('%m/%d/%Y'))).fetchall()
+
+incomes = dict(incomes)
+expenses = dict(expenses)
 
 # Create sankey chart
-label = [x['_id'] for x in incomes] + ["Total Income"] + [x['_id'] for x in expenses]
+label = [x for x in incomes.keys()] + ["Total Income"] + [x for x in expenses.keys()]
 source = list(range(len(incomes))) + [len(incomes)] * len(expenses)
-target = [len(incomes)] * len(incomes) + [label.index(expense['_id']) for expense in expenses]
-value = [x['Total'] for x in incomes] + [-1*x['Total'] for x in expenses]
+target = [len(incomes)] * len(incomes) + [label.index(expense) for expense in expenses.keys()]
+value = [x for x in incomes.values()] + [-1*x for x in expenses.values()]
 
 node_colours = [px.colors.qualitative.Pastel1[i % len(px.colors.qualitative.Pastel1)] for i in range(len(label))]
 link_colours = [node_colours[trgt].replace('rgb', 'rgba').replace(')', ',0.7)') for trgt in target]

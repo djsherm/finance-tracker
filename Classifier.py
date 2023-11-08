@@ -15,8 +15,8 @@ class Classifier:
 
     def load_data(self, df):
         '''Clean data and load in pipeline'''
-        X = df['Description']
-        y = df['Category']
+        X = df['description']
+        y = df['category']
 
         X = X.apply(self._strip_nonalpha)
 
