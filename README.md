@@ -10,8 +10,7 @@ This is a tool built to help track, categorize, and visualize your income/expens
 
 ## Prerequisites
 1. Requires Python and pip to be installed. Install requirements with `pip install -r requirements.txt`
-2. Requires a MongoDB instance to be running locally on your machine. You can install the community edition [here](https://www.mongodb.com/try/download/community).
-3. Banks currently supported:
+2. Banks currently supported:
     - RBC
 
 ### How Auto-Categorization Works
